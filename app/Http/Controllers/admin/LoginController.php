@@ -26,23 +26,10 @@ class LoginController extends Controller {
                     'user_image' => Auth::guard('admin')->user()->user_image,
                     'id' => Auth::guard('admin')->user()->id
                 );
-                Session::push('logindata', $loginData);
+                Session::push('adminlogindata', $loginData);
                 $return['status'] = 'success';
                 $return['message'] = "Well Done login Successfully!";
-                $return['redirect'] = route('admin-login');
-            } else if (Auth::guard('user')->attempt(['email' => $request->input('email'), 'password' => $request->input('user'), 'usertype' => 'user'])) {
-
-                $loginData = array(
-                    'name' => Auth::guard('user')->user()->name,
-                    'email' => Auth::guard('user')->user()->email,
-                    'type' => Auth::guard('user')->user()->type,
-                    'user_image' => Auth::guard('user')->user()->user_image,
-                    'id' => Auth::guard('user')->user()->id
-                );
-                Session::push('logindata', $loginData);
-                $return['status'] = 'success';
-                $return['message'] = "Well Done login Successfully!";
-                $return['redirect'] = route('admin-login');
+                $return['redirect'] = route('admin-dashboard');
             } else {
                 $return['status'] = 'error';
                 $return['message'] = "Invaild Id Or Password";
@@ -56,6 +43,17 @@ class LoginController extends Controller {
         $data['js'] = array('ajaxfileupload.js', 'jquery.form.min.js', 'login.js', 'comman_function.js', 'jquery.validate.min.js');
         $data['funinit'] = array('Login.init()');
         return view('admin.pages.login', $data);
+    }
+
+    public function getLogout() {
+        $this->resetGuard();
+        return redirect()->route('admin-login');
+    }
+
+    public function resetGuard() {
+        Auth::logout();
+        Auth::guard('admin')->logout();
+        Session::forget('adminlogindata');
     }
 
 }
